@@ -1,0 +1,18 @@
+Final tasks
+
+Task 12
+
+Update your admin app to show statistics about the captions that users are rating.
+Update your prompt tool to add the ability to duplicate a humor flavor and it’s related steps with a new, unique name.
+Submit the latest commit-specific URL of your three Vercel apps (your caption creation and rating app, your admin area app, and your prompt chain tool app) in the “Submissions” section.
+Task 13
+
+Perform end-to-end testing of your full system (all three projects) and prepare your final submission.
+#Deliverables
+ ##Testing
+Run full workflow tests at least 3 times and verify everything works as expected. Fix any bugs or broken flows so the system is demo-ready.
+##Write Summary
+Create a full test plan for all three of your applications (Project 1, Project 2, and Project 3). Think about your application like a tree. Each logical pathway through the application is a branch on your tree. Aim to have a comprehensive testing plan that covers all the branches on your tree. (for this, after you finish coding, just type out some text addressing these)
+After testing, write 5-8 bullet points describing what you tested, any issues you found, and what you fixed. (same as above)
+#Submission
+ Submit the latest commit-specific URL of your three Vercel apps (your caption creation and rating app, your admin area app, and your prompt chain tool app) in the “Submissions” section.

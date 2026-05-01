@@ -1,0 +1,165 @@
+﻿Tasks and Assignments from THP Company
+Task 1 
+Get a simple ‘Hello World’ app deployed on Vercel:
+1. Create a new GitHub repository.
+2. Clone that GitHub repository using IntelliJ
+3. Create a new NextJS app with your favorite CLI tool.
+4. Commit your changes to GitHub.
+5. Create a new project in Vercel and connect it to your new GitHub repository.
+6. Make sure your app is successfully deployed in Vercel.
+7. Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+8. Submit the commit-specific URL of your Vercel app in the “Submissions” section.
+
+
+Task 2 
+
+
+you will extend the app you deployed in Assignment #1 so that it reads data from Supabase and renders it on a list page, then redeploys to Vercel.
+1. Continue from your existing GitHub repository. Use the same Next.js app you created in Assignment #1.
+
+2. Connect your app to Supabase. Store your Supabase URL and anon key in environment variables (do not hardcode them).
+
+Supabase anon key:
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpaHNnbmZqcW1ram1vb3d5ZmJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1Mjc0MDAsImV4cCI6MjA2NTEwMzQwMH0.c9UQS_o2bRygKOEdnuRx7x7PeSf_OUGDtf9l3fMqMSQ
+
+Supabase project ID:
+qihsgnfjqmkjmoowyfbn
+
+
+
+   3. 
+Read from a pre-existing Supabase table of your choice (do not create a new table). Fetch rows from the table.
+
+   4. Render a list page. Display the rows returned from Supabase in a list, table, or card format.
+
+   5. Commit and push your changes to GitHub. Deploy the changes to Vercel.
+
+   6. Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+
+   7. Submit the commit-specific URL of your Vercel app in the “Submissions” section.
+
+Task 3
+
+
+Extend your app from assignment #2. Update it so that it protects a given route and shows a gated UI.
+Here’s our Google OAuth Client ID:
+388960353527-fh4grc6mla425lg0e3g1hh67omtrdihd.apps.googleusercontent.com
+
+
+
+
+
+The assignment can/should be done without a Google Client Secret.
+Be sure that your redirect URI is /auth/callback in your application.
+Make sure you are redirecting to /auth/callback, not any other route with any other query parameters.
+I suggest using the following NodeJS packages:
+      * @supabase/ssr (server/browser auth client wiring)
+      * @supabase/supabase-js (Auth API calls)
+Note: Please do not update/enable/disable any RLS policies in Supabase.
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+Submit the commit-specific URL of your Vercel app in the “Submissions” section.
+Task 4
+
+
+In this assignment, you will extend your existing app from Assignment #3 by adding functionality that allows logged-in users to “rate” captions. This means users should be able to interact with captions and submit a vote (for example, upvote or downvote), and your app should store that vote in the database.
+The key goal of this assignment is to practice mutating data, which means creating new rows in your database rather than just reading existing data. Specifically, when a user submits a vote, your app should insert a new row into the caption_votes table that records the user’s vote and associates it with the correct caption. Because mutating data requires authentication, you must ensure that only logged-in users are able to submit votes. If a user is not logged in, they should not be able to rate captions. Your app should use the authentication system you implemented previously to enforce this.
+The purpose of this assignment is to help you understand how modern web apps allow users to create and modify data, not just display it.
+Note: Please do not update/enable/disable any RLS policies in Supabase.
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+When you are finished, deploy your app to Vercel and submit the commit-specific URL of your deployment in the Submissions section.
+
+
+Task 5
+
+
+Iterate on your application from assignment #4.
+In this assignment you will get your app to upload images and show resulting captions. This will be done by sending POST request to our staging REST API: https://api.almostcrackd.ai.
+Checkout the “Documentation” section for information on how to use the caption generation API.
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+Submit the commit-specific URL of your Vercel app in the “Submissions” section
+________________
+
+
+Documentation, Caption Generation API
+
+
+
+
+How to Call the Caption Pipeline API
+Use this base URL for all API calls: https://api.almostcrackd.ai
+You will make requests in this order:
+      1. Generate a presigned upload URL
+      2. Upload image bytes to that presigned URL
+      3. Register the uploaded image URL with the pipeline
+      4. Generate captions from the registered image
+Requirements
+      * A valid JWT access token
+      * Include auth header on API routes:
+      * Authorization: Bearer <your-token>
+      * Supported image content types:
+      * image/jpeg, image/jpg, image/png, image/webp, image/gif, image/heic
+Step 1: Generate Presigned URL
+Request
+POST https://api.almostcrackd.ai/pipeline/generate-presigned-url
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "contentType": "image/jpeg"
+}
+Response
+{
+  "presignedUrl": "https://....",
+  "cdnUrl": "https://presigned-url-uploads.almostcrackd.ai/<userId>/<filename>.jpg"
+}
+      * presignedUrl: direct upload target (S3 signed URL)
+      * cdnUrl: public URL of the uploaded image (used in Step 3)
+Step 2: Upload Image Bytes to presignedUrl
+This is a PUT request directly to the returned presignedUrl (not to api.almostcrackd.ai).
+await fetch(presignedUrl, {
+  method: "PUT",
+  headers: {
+    "Content-Type": file.type
+  },
+  body: file
+});
+Important: Content-Type should match what you sent in Step 1.
+Step 3: Register Image URL in the Pipeline
+Request
+POST https://api.almostcrackd.ai/pipeline/upload-image-from-url
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "imageUrl": "<cdnUrl from Step 1>",
+  "isCommonUse": false
+}
+Response
+{
+  "imageId": "uuid-value",
+  "now": 1738690000000
+}
+Save imageId for the caption step.
+Step 4: Generate Captions
+Request
+POST https://api.almostcrackd.ai/pipeline/generate-captions
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "imageId": "uuid-value-from-step-3"
+}
+Response
+Returns an array of caption records generated and saved by the system.
+Captions for Specific Flavor
+To generate captions for one humor flavor, call POST /pipeline/generate-captions and include humorFlavorId in the JSON body.
+curl -X POST https://api.almostcrackd.ai/pipeline/generate-captions
+ -H “Authorization: Bearer <SUPABASE_JWT>”
+-H “Content-Type: application/json”
+-d ‘{
+“imageId”: “”,
+“humorFlavorId”:
+}’

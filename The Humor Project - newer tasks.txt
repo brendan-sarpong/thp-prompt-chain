@@ -1,0 +1,265 @@
+
+Documentation, Caption Generation API
+
+
+How to Call the Caption Pipeline API
+Use this base URL for all API calls: https://api.almostcrackd.ai
+You will make requests in this order:
+Generate a presigned upload URL
+Upload image bytes to that presigned URL
+Register the uploaded image URL with the pipeline
+Generate captions from the registered image
+Requirements
+A valid JWT access token
+Include auth header on API routes:
+Authorization: Bearer <your-token>
+Supported image content types:
+image/jpeg, image/jpg, image/png, image/webp, image/gif, image/heic
+Step 1: Generate Presigned URL
+Request
+POST https://api.almostcrackd.ai/pipeline/generate-presigned-url
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "contentType": "image/jpeg"
+}
+Response
+{
+  "presignedUrl": "https://....",
+  "cdnUrl": "https://presigned-url-uploads.almostcrackd.ai/<userId>/<filename>.jpg"
+}
+presignedUrl: direct upload target (S3 signed URL)
+cdnUrl: public URL of the uploaded image (used in Step 3)
+Step 2: Upload Image Bytes to presignedUrl
+This is a PUT request directly to the returned presignedUrl (not to api.almostcrackd.ai).
+await fetch(presignedUrl, {
+  method: "PUT",
+  headers: {
+    "Content-Type": file.type
+  },
+  body: file
+});
+Important: Content-Type should match what you sent in Step 1.
+Step 3: Register Image URL in the Pipeline
+Request
+POST https://api.almostcrackd.ai/pipeline/upload-image-from-url
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "imageUrl": "<cdnUrl from Step 1>",
+  "isCommonUse": false
+}
+Response
+{
+  "imageId": "uuid-value",
+  "now": 1738690000000
+}
+Save imageId for the caption step.
+Step 4: Generate Captions
+Request
+POST https://api.almostcrackd.ai/pipeline/generate-captions
+Headers:
+Authorization: Bearer <your-token>
+Content-Type: application/json
+Body:
+{
+  "imageId": "uuid-value-from-step-3"
+}
+Response
+Returns an array of caption records generated and saved by the system.
+Captions for Specific Flavor
+To generate captions for one humor flavor, call POST /pipeline/generate-captions and include humorFlavorId in the JSON body.
+curl -X POST https://api.almostcrackd.ai/pipeline/generate-captions
+ -H “Authorization: Bearer <SUPABASE_JWT>”
+ -H “Content-Type: application/json”
+ -d ‘{
+ “imageId”: “”,
+ “humorFlavorId”:
+ }’
+
+
+Now for the tasks 
+
+
+Task 6 
+
+
+Create new GitHub repository and a new project in Vercel.
+For this project, you’ll create an admin area for the database.
+Design an interface showing off interesting statistics from the data. Be creative in the data you choose to highlight and the way in which you highlight it.
+Also create a way to manage users/profiles, images, and captions.
+You should be able to:
+READ users/profiles
+CREATE/READ/UPDATE/DELETE images
+READ captions
+Important: Make sure every route in your admin area is behind a Google login wall. Only allow users with profiles.is_superadmin==TRUE. If you don’t do this step, you’ll expose our staging environment to the entire internet.
+Question: But wait, if profiles.is_superadmin==TRUE is required to use your own admin area, won’t you be locked out? Given the tools and access you currently have at your disposal, how could you solve this problem?
+Note: Please do not update/enable/disable any RLS policies in Supabase.
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+Submit the latest commit-specific URL of your two Vercel apps (caption creation and rating app and your admin area app) in the “Submissions” section.
+Task 7
+
+Update your admin area application to:
+read users (from profiles table)
+create/read/update/delete images (including upload new images)
+read humor flavors
+read humor flavor steps
+read/update humor mix
+create/read/update/delete terms
+read captions
+read caption requests
+create/read/update/delete caption examples
+create/read/update/delete llm models
+create/read/update/delete llm providers
+read llm prompt chains
+read llm responses
+create/read/update/delete allowed signup domains
+create/read/update/delete whitelisted e-mail addresses
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+Submit the latest commit-specific URL of your two Vercel apps (caption creation and rating app and your admin area app) in the “Submissions” section.
+
+Task 8
+
+For this project, you’ll create a tool to manage humor flavors and humor flavor steps.
+Create a new GitHub repository and new Vercel project.
+The goal is to create a prompt chain tool that can:
+Create new humor flavors
+Create new steps for humor flavors
+Edit steps for humor flavors
+Reorder the steps of the humor flavor
+Generate captions using an image test set
+Use our REST API (api.almostcrackd.ai) from Task 5 to create captions using a given humor flavor in your prompt chain tool.
+A humor flavor is a set of steps that run in specific order to create captions from an input image.
+An example of a set of steps could be:
+Take in an image and output a description it in text.
+Take output from step 1 and output something funny about it.
+Take the output from step 2 and output five short, funny captions.
+You’ll want to design an interface that can:
+only work if the user is logged in as profiles.is_superadmin==TRUE or profiles.is_matrix_admin==TRUE
+create a humor flavor
+update a humor flavor
+delete a humor flavor
+create a humor flavor step
+update a humor flavor step
+delete a humor flavor step
+reorder a humor flavor step (move step 2 to step 1, etc)
+read the captions produced by a specific humor flavor
+support dark mode / light mode / system default mode
+test a humor flavor by generating captions using the REST API
+Turn off Vercel “deployment protection” so that you can view your page in Incognito Mode.
+Submit the latest commit-specific URL of your three Vercel apps (your caption creation and rating app, your admin area app, and your prompt chain tool app) in the “Submissions” section.
+Task 9 
+
+Assignment: In-Person User Study and Functionality Review
+Overview
+The purpose of this assignment is to evaluate the functionality and usability of your generative joke application (Project 1) through direct, in-person observation of real users.
+You will conduct three (3) in-person user studies where you observe participants interacting with your application. Your goal is to understand how users navigate, interpret, and use your application.
+Important: This assignment evaluates the application’s functionality and user experience, NOT the quality of the jokes. Do not include feedback about whether the jokes are funny, clever, offensive, or enjoyable. Focus only on usability, interaction, and functionality.
+You must document your findings in Markdown format and paste your write-up into the submission box. Your report should be clearly organized, structured, and easy to read.
+
+Requirements
+You must:
+Conduct 3 separate user studies
+Conduct each study in person
+Actively observe the user while they use your application
+Watch the user interact with the application in real time
+Write your report in Markdown
+Submit it in the Submissions section
+Keep your report organized, clearly structured, and readable
+Remote studies, recorded sessions, or unobserved usage are not allowed.
+
+What to Record for Each User Study
+Create a separate section for each of the 3 users. For each user study, include the following:
+
+1. User Information
+Include:
+Your relationship to the user
+ (example: friend, classmate, family member, acquaintance, stranger)
+Whether the user has used your app before
+ (none, minimal, moderate, extensive)
+Whether the user has experience with similar applications (if known)
+
+2. Observation Context
+Describe the study setup:
+Where the study took place
+What device was used (laptop, phone, tablet, etc.)
+What instructions you gave the user (if any)
+What tasks you asked the user to perform, or whether you allowed free exploration
+
+3. Three Things the User Liked (Functionality Only)
+List at least three specific positive observations related to usability or functionality.
+Examples:
+The interface was easy to understand
+Buttons were clearly labeled
+Navigation was intuitive
+The app responded quickly
+Do not include statements about joke quality.
+
+4. Three Areas for Improvement
+List at least three specific areas where the app could be improved.
+Examples:
+User was unsure where to click first
+A feature was difficult to find
+Instructions were unclear
+User misunderstood how something worked
+Be specific and actionable.
+
+5. Observed Friction or Confusion
+Describe any friction you observed, such as:
+Hesitation before clicking
+Misclicks or incorrect navigation
+User confusion
+User asking questions
+User getting stuck
+User not noticing important features
+Focus on what you observed.
+
+6. Behavioral Observations
+Describe what the user actually did, including:
+Where they looked first
+What actions they took
+Whether they explored or waited for guidance
+Whether they missed or ignored features
+Whether they hesitated or seemed confident
+Focus on objective observations, not just their verbal feedback.
+
+7. User Quotes (Optional but Recommended)
+Include 1–3 quotes related to usability or functionality.
+Examples:
+“I don’t know what this button does.”
+“This was easier than I expected.”
+Do not include quotes evaluating joke quality.
+
+Final Summary (After All 3 Studies)
+After completing all three user studies, write a summary section reflecting on the overall findings from your observations.
+In this summary, include:
+Things you learned from observing users
+Things you found surprising
+Patterns you noticed across multiple users
+At least three specific improvements you plan to make to your application based on this study
+Be specific and connect your planned improvements directly to your observations.
+
+Task 10
+
+Create and test your own humor flavor using your own humor flavor testing tool.
+Submit the latest commit-specific URL of your three Vercel apps (your caption creation and rating app, your admin area app, and your prompt chain tool app) in the “Submissions” section.
+Also include the name of the humor flavor you created in the staging environment and five of the funniest captions it created along with a short description of the image for the caption.
+
+
+Task 11
+
+For this assignment, please refer to the feedback markdown you submitted in Assignment #9.
+Deliverables:
+Implement improvements based on feedback.
+Make changes to your caption ranking app that is directly motivated by user feedback. Your changes must clearly address real problems that users experienced. Avoid making arbitrary feature additions that are not tied to observed feedback.
+Write a summary of your changes.
+Document the changes you made to your application and why. Submit that below along with your Vercel links.
+Submission
+Submit the latest commit-specific URL of your three Vercel apps (your caption creation and rating app, your admin area app, and your prompt chain tool app) in the “Submissions” section. Also, submit your short report of changes.
+
+
+
